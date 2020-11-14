@@ -1,6 +1,6 @@
 # Simple TODO list
 Terminal simple ToDo list in Java.
-Project releated to **Tasks** module1 workshop in [CodersLab](coderslab.pl) Java Developer training programe (*WAR_JEE_W_18* group)  
+Project releated to **Tasks** module1 workshop in [CodersLab](coderslab.pl) Java Developer training program (*WAR_JEE_W_18* group)  
 
 # Features
 According to **Tasks** project requirements: 
