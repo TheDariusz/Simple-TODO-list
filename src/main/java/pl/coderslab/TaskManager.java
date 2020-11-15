@@ -31,6 +31,8 @@ class TaskManager {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("Problems with data file!");
+            System.out.format("Please check file: %s", TASKS_FILE_DATABASE);
         }
         return arrTasks;
     }
