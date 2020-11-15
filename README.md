@@ -4,7 +4,7 @@ Project releated to **Tasks** module1 workshop in [CodersLab](coderslab.pl) Java
 
 # Features
 According to **Tasks** project requirements: 
-- all avaiable tasks displaying 
+- all available tasks displaying
 - task adding 
 - task removing
 - storage data in one file 
