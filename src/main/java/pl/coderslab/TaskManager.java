@@ -19,19 +19,23 @@ class TaskManager {
     private static String[][] getTasksFromFile() {
         File file = new File(TASKS_FILE_DATABASE);
         String[][] arrTasks = new String[0][0];
-        int numberOfLines=0;
+        int numberOfLines = 0;
 
         try (Scanner scan = new Scanner(file)) {
             while (scan.hasNextLine()) {
                 String line = scan.nextLine();
-                String[] oneTask = {"Simple task - very important", "2020-03-09", "true"}; //getTaskFromLine(line);
-                arrTasks = Arrays.copyOf(arrTasks,arrTasks.length+1);
-                arrTasks[numberOfLines]=oneTask;
+                String[] oneTask = splitColumns(line);
+                arrTasks = Arrays.copyOf(arrTasks, arrTasks.length + 1);
+                arrTasks[numberOfLines] = oneTask;
                 numberOfLines++;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
         return arrTasks;
+    }
+
+    private static String[] splitColumns(String line) {
+        return line.split(",");
     }
 }
