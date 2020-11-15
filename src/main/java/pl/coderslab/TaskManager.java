@@ -10,10 +10,11 @@ class TaskManager {
 
     public static final String TASKS_FILE_DATABASE = "tasks.csv";
     public static final char FILE_DELIMITER = ',';
+    public static final String[] MENU_OPTIONS = {"add", "remove", "list", "exit"};
 
     public static void main(String[] args) {
-        String[][] tasks = getTasksFromFile();
-
+       // String[][] tasks = getTasksFromFile();
+        System.out.println(menuHandler());
     }
 
     private static String[][] getTasksFromFile() {
@@ -33,5 +34,20 @@ class TaskManager {
             e.printStackTrace();
         }
         return arrTasks;
+    }
+
+    private static String menuHandler(){
+        Scanner input = new Scanner(System.in);
+
+        while (input.hasNext()) {
+            String token = input.next();
+            for (String option : MENU_OPTIONS){
+                if (option.equals(token)){
+                    return token;
+                }
+            }
+            System.out.println("There in no such option!");
+        }
+        return "exit";
     }
 }
