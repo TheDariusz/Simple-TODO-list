@@ -14,8 +14,8 @@ class TaskManager {
 
     public static void main(String[] args) {
         //displayAllTasks(getTasksFromFile());
-        String[][] tasks = addTask(getTasksFromFile());
-        displayAllTasks(tasks);
+        //String[][] tasks = addTask(getTasksFromFile());
+        //displayAllTasks(tasks);
     }
 
     /*
