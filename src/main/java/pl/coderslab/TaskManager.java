@@ -13,10 +13,19 @@ class TaskManager {
     public static final String[] MENU_OPTIONS = {"add", "remove", "list", "exit"};
 
     public static void main(String[] args) {
+        //String[][] tasks = getTasksFromFile();
+        displayMenu();
+
        // String[][] tasks = getTasksFromFile();
         System.out.println(menuHandler());
     }
 
+    private static void displayMenu() {
+        System.out.println(ConsoleColors.RESET);
+        System.out.println(ConsoleColors.BLUE + "Please select an option:");
+        System.out.print(ConsoleColors.RESET);
+        for (String menuItem : MENU_OPTIONS){
+            System.out.println(menuItem);
 
     private static String menuHandler(){
         Scanner input = new Scanner(System.in);
@@ -32,4 +41,5 @@ class TaskManager {
         }
         return "exit";
     }
+
 }
