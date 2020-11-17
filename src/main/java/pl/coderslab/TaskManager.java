@@ -13,12 +13,13 @@ class TaskManager {
     public static final String[] MENU_OPTIONS = {"add", "remove", "list", "exit"};
 
     public static void main(String[] args) {
-        //String[][] tasks = getTasksFromFile();
-        displayMenu();
 
-        System.out.println(menuHandler());
     }
 
+    /*
+    Method displays on the user screen predefined menu
+    Menu options are store in MENU_OPTIONS final string array
+     */
     private static void displayMenu() {
         System.out.println(ConsoleColors.RESET);
         System.out.println(ConsoleColors.BLUE + "Please select an option:");
@@ -28,6 +29,10 @@ class TaskManager {
         }
     }
 
+    /*
+    Method uses Scanner to get user input and checks if provided string corresponding to one of system menu
+    Method returns matching token as String
+     */
     private static String menuHandler(){
         Scanner input = new Scanner(System.in);
 
