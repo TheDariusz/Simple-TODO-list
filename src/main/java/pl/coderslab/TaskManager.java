@@ -16,7 +16,6 @@ class TaskManager {
         //String[][] tasks = getTasksFromFile();
         displayMenu();
 
-       // String[][] tasks = getTasksFromFile();
         System.out.println(menuHandler());
     }
 
@@ -26,6 +25,8 @@ class TaskManager {
         System.out.print(ConsoleColors.RESET);
         for (String menuItem : MENU_OPTIONS){
             System.out.println(menuItem);
+        }
+    }
 
     private static String menuHandler(){
         Scanner input = new Scanner(System.in);
