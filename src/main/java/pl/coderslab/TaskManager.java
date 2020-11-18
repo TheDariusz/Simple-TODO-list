@@ -13,7 +13,7 @@ class TaskManager {
     public static final String[] MENU_OPTIONS = {"add", "remove", "list", "exit"};
 
     public static void main(String[] args) {
-        String[][] tasks = getTasksFromFile();
+        //String[][] tasks = getTasksFromFile();
 
     }
 
