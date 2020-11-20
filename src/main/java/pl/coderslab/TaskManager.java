@@ -5,7 +5,10 @@ import org.apache.commons.lang3.ArrayUtils;
 
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -14,6 +17,7 @@ class TaskManager {
     private static final String TASKS_FILE_DATABASE = "tasks.csv";
     private static final String FILE_DELIMITER = ",";
     public static final String[] MENU_OPTIONS = {"add", "remove", "list", "exit"};
+    public static final String EMPTY_STRING = " ";
 
     public static void main(String[] args) {
         //displayAllTasks(getTasksFromFile());
@@ -21,23 +25,31 @@ class TaskManager {
         //displayAllTasks(tasks);
         String[][] tasks = readTasksFromFile();
         displayMenu();
-        String option = menuHandler();
 
-        switch (option){
-            case "add":
-                System.out.println(ConsoleColors.RED + "Add task option was chosen!");
-                System.out.print(ConsoleColors.RESET);
-                break;
-            case "remove":
-                System.out.println(ConsoleColors.RED + "Remove task option was chosen!");
-                System.out.print(ConsoleColors.RESET);
-                break;
-            case "list":
-                displayAllTasks(tasks);
-                break;
-            case "exit":
-                System.out.println(ConsoleColors.RED + "BYE BYE!");
-                System.out.print(ConsoleColors.RESET);
+
+        while (true) {
+            String option = menuHandler();
+            switch (option) {
+                case "add":
+                    tasks = addTask(tasks);
+                    System.out.println(ConsoleColors.RED + "Task was added!");
+                    System.out.print(ConsoleColors.RESET);
+                    displayMenu();
+                    break;
+                case "remove":
+                    System.out.println(ConsoleColors.RED + "Remove task option was chosen!");
+                    System.out.print(ConsoleColors.RESET);
+                    break;
+                case "list":
+                    displayAllTasks(tasks);
+                    break;
+                case "exit":
+                    writeListToFile(tasks);
+                    System.out.println(ConsoleColors.RED + "BYE BYE!");
+                    System.out.print(ConsoleColors.RESET);
+                    break;
+            }
+            if (option.equals("exit")) break;
         }
     }
 
@@ -67,7 +79,7 @@ class TaskManager {
         int id = tasks.length;
         String[] task = getTaskFromUser(id);
         tasks = Arrays.copyOf(tasks, tasks.length+1);
-        tasks[task.length-1]=task;
+        tasks[tasks.length-1]=task;
         return tasks;
     }
 
@@ -183,5 +195,23 @@ class TaskManager {
             System.out.println("There in no such option!");
         }
         return "exit";
+    }
+
+    private static void writeListToFile(String[][] tasks) {
+
+        try (FileWriter file = new FileWriter(TASKS_FILE_DATABASE, false)) {
+            for (String[] task : tasks) {
+                StringBuilder fileLine = new StringBuilder();
+                for (int i = 0; i < task.length; i++) {
+                    if (i==0) continue; //do not write id of line
+                    fileLine.append(task[i]);
+                    if (i<task.length-1) fileLine.append(FILE_DELIMITER); //do not add delimiter with the last column
+                }
+                file.append(fileLine).append("\n");
+            }
+        } catch (IOException e) {
+            System.out.println("Problems with file writing!");
+            e.printStackTrace();
+        }
     }
 }
