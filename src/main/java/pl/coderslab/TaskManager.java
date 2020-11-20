@@ -68,7 +68,7 @@ class TaskManager {
     Method use addAll method from ArrayUtils class
     */
     private static String[] addIndexAtBeginning(int numberOfLines, String[] oneTask) {
-        String[] lineWithIndex = new String[oneTask.length+1];
+        String[] lineWithIndex = new String[1];
         lineWithIndex[0]= String.valueOf(numberOfLines);
         return ArrayUtils.addAll(lineWithIndex, oneTask);
     }
