@@ -1,6 +1,8 @@
 package pl.coderslab;
 
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -14,9 +16,32 @@ class TaskManager {
 
     public static void main(String[] args) {
         String[][] tasks = readTasksFromFile();
-        System.out.println(tasks);
+        displayMenu();
+        String option = menuHandler();
+
+        switch (option){
+            case "add":
+                System.out.println(ConsoleColors.RED + "Add task option was chosen!");
+                System.out.print(ConsoleColors.RESET);
+                break;
+            case "remove":
+                System.out.println(ConsoleColors.RED + "Remove task option was chosen!");
+                System.out.print(ConsoleColors.RESET);
+                break;
+            case "list":
+                System.out.println(ConsoleColors.RED + "Show all tasks option was chosen!");
+                System.out.print(ConsoleColors.RESET);
+                break;
+            case "exit":
+                System.out.println(ConsoleColors.RED + "BYE BYE!");
+                System.out.print(ConsoleColors.RESET);
+        }
     }
 
+    /*
+    Method get tasks from file TASK_FILE_DATABASE and return these tasks in 2d array
+    If there is problem with TASK_FILE_DATABASE file method throws log from IOException
+     */
     private static String[][] readTasksFromFile() {
         File file = new File(TASKS_FILE_DATABASE);
         String[][] arrTasks = new String[0][0];
@@ -37,15 +62,20 @@ class TaskManager {
         return arrTasks;
     }
 
+    /*
+    Method gets a number and String array and puts the number at the beginning of the array
+    It returns new shifted String arr with the number at the  first index
+    Method use addAll method from ArrayUtils class
+    */
     private static String[] addIndexAtBeginning(int numberOfLines, String[] oneTask) {
         String[] lineWithIndex = new String[oneTask.length+1];
         lineWithIndex[0]= String.valueOf(numberOfLines);
-        for (int i=1; i<lineWithIndex.length; i++){
-            lineWithIndex[i]=oneTask[i-1];
-        }
-        return lineWithIndex;
+        return ArrayUtils.addAll(lineWithIndex, oneTask);
     }
 
+    /*
+    Method split string to arr String based on FILE_DELIMITER
+     */
     private static String[] createTask(String line) {
         return line.split(FILE_DELIMITER);
     }
