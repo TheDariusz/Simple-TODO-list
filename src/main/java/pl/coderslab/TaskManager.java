@@ -33,8 +33,7 @@ class TaskManager {
                 System.out.print(ConsoleColors.RESET);
                 break;
             case "list":
-                System.out.println(ConsoleColors.RED + "Show all tasks option was chosen!");
-                System.out.print(ConsoleColors.RESET);
+                displayAllTasks(tasks);
                 break;
             case "exit":
                 System.out.println(ConsoleColors.RED + "BYE BYE!");
@@ -142,7 +141,7 @@ class TaskManager {
     Method use addAll method from ArrayUtils class
     */
     private static String[] addIndexAtBeginning(int numberOfLines, String[] oneTask) {
-        String[] lineWithIndex = new String[oneTask.length+1];
+        String[] lineWithIndex = new String[1];
         lineWithIndex[0]= String.valueOf(numberOfLines);
         return ArrayUtils.addAll(lineWithIndex, oneTask);
     }
