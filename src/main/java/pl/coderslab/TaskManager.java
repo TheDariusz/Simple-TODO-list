@@ -7,8 +7,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -16,13 +14,13 @@ class TaskManager {
 
     private static final String TASKS_FILE_DATABASE = "tasks.csv";
     private static final String FILE_DELIMITER = ",";
-    public static final String[] MENU_OPTIONS = {"add", "remove", "list", "exit"};
-    public static final String EMPTY_STRING = " ";
+    private static final String[] MENU_OPTIONS = {"add", "remove", "list", "exit"};
+    private static final String YES = "y";
+    private static final String NO = "n";
+    private static final String EMPTY_STRING = " ";
 
     public static void main(String[] args) {
-        //displayAllTasks(getTasksFromFile());
-        //String[][] tasks = addTask(getTasksFromFile());
-        //displayAllTasks(tasks);
+
         String[][] tasks = readTasksFromFile();
         displayMenu();
 
@@ -37,14 +35,25 @@ class TaskManager {
                     displayMenu();
                     break;
                 case "remove":
-                    System.out.println(ConsoleColors.RED + "Remove task option was chosen!");
-                    System.out.print(ConsoleColors.RESET);
+                    if (tasks.length > 0) {
+                        tasks = removeTask(tasks);
+                        System.out.println(ConsoleColors.RED + "Task was removed!");
+                        System.out.print(ConsoleColors.RESET);
+                    } else {
+                        System.out.println(ConsoleColors.RED + "There is no task to remove!");
+                        System.out.print(ConsoleColors.RESET);
+                    }
                     break;
                 case "list":
                     displayAllTasks(tasks);
                     break;
                 case "exit":
-                    writeListToFile(tasks);
+                    if (isSave()) {
+                        writeListToFile(tasks);
+                        System.out.println(ConsoleColors.RED + "List was saved to file");
+                        System.out.print(ConsoleColors.RESET);
+                    }
+
                     System.out.println(ConsoleColors.RED + "BYE BYE!");
                     System.out.print(ConsoleColors.RESET);
                     break;
@@ -53,16 +62,14 @@ class TaskManager {
         }
     }
 
-    /*
-    Method displays all tasks from 2d array provided as argument
-     */
-    public static void displayAllTasks(String[][] tasks){
+
+    public static void displayAllTasks(String[][] tasks) {
         System.out.println(ConsoleColors.RESET);
         System.out.println(ConsoleColors.PURPLE + "List of saved tasks: ");
         System.out.print(ConsoleColors.RESET);
 
-        for (String[] line : tasks){
-            for (String task : line){
+        for (String[] line : tasks) {
+            for (String task : line) {
                 System.out.print(task + " | ");
             }
             System.out.println();
@@ -71,26 +78,19 @@ class TaskManager {
         System.out.println(ConsoleColors.RESET);
     }
 
-    /*
-    Method add task to provided 2d array of tasks
-    Method return new 2d array with new task
-    */
-    public static String[][] addTask(String[][] tasks){
-        int id = tasks.length;
+
+    public static String[][] addTask(String[][] tasks) {
+        int id = tasks.length + 1;
         String[] task = getTaskFromUser(id);
-        tasks = Arrays.copyOf(tasks, tasks.length+1);
-        tasks[tasks.length-1]=task;
+        tasks = Arrays.copyOf(tasks, tasks.length + 1);
+        tasks[tasks.length - 1] = task;
         return tasks;
     }
 
-    /*
-    Method gets data from user based on Scanner input and returns these data in String array
-    For now, method doesn't check any data validation (except zero string length)
-    New task id is getting from method argument
-     */
+
     private static String[] getTaskFromUser(int id) {
         String[] task = new String[4];
-        task[0]=Integer.toString(id);
+        task[0] = Integer.toString(id);
 
         System.out.println(ConsoleColors.RESET);
         System.out.println(ConsoleColors.PURPLE + "Provide details of new task: ");
@@ -108,11 +108,7 @@ class TaskManager {
         return task;
     }
 
-    /*
-    Method uses Scanner to get data from user input
-    Validation: it only checks zero string length (as recursive calling)
 
-     */
     private static String getUserInput() {
         Scanner input = new Scanner(System.in);
         String userInput = input.nextLine();
@@ -123,10 +119,7 @@ class TaskManager {
         return getUserInput();
     }
 
-    /*
-    Method get tasks from file TASK_FILE_DATABASE and return these tasks in 2d array
-    If there is problem with TASK_FILE_DATABASE file method throws log from IOException
-     */
+
     private static String[][] readTasksFromFile() {
         File file = new File(TASKS_FILE_DATABASE);
         String[][] arrTasks = new String[0][0];
@@ -147,54 +140,41 @@ class TaskManager {
         return arrTasks;
     }
 
-    /*
-    Method gets a number and String array and puts the number at the beginning of the array
-    It returns new shifted String arr with the number at the  first index
-    Method use addAll method from ArrayUtils class
-    */
+
     private static String[] addIndexAtBeginning(int numberOfLines, String[] oneTask) {
         String[] lineWithIndex = new String[1];
-        lineWithIndex[0]= String.valueOf(numberOfLines);
+        lineWithIndex[0] = String.valueOf(numberOfLines + 1);
         return ArrayUtils.addAll(lineWithIndex, oneTask);
     }
 
-    /*
-    Method split string to arr String based on FILE_DELIMITER
-     */
+
     private static String[] createTask(String line) {
         return line.split(FILE_DELIMITER);
     }
 
-    /*
-    Method displays on the user screen predefined menu
-    Menu options are store in MENU_OPTIONS final string array
-     */
+
     private static void displayMenu() {
         System.out.println(ConsoleColors.RESET);
         System.out.println(ConsoleColors.BLUE + "Please select an option:");
         System.out.print(ConsoleColors.RESET);
-        for (String menuItem : MENU_OPTIONS){
+        for (String menuItem : MENU_OPTIONS) {
             System.out.println(menuItem);
         }
     }
 
-    /*
-    Method uses Scanner to get user input and checks if provided string corresponding to one of system menu
-    Method returns matching token as String
-     */
-    private static String menuHandler(){
-        Scanner input = new Scanner(System.in);
-
-        while (input.hasNext()) {
-            String token = input.next();
-            for (String option : MENU_OPTIONS){
-                if (option.equals(token)){
-                    return token;
-                }
-            }
-            System.out.println("There in no such option!");
+    private static String menuHandler() {
+        String token;
+        while (isNotInMenu(token = getUserInput(), MENU_OPTIONS)) {
+            System.out.println("There is no such option!");
         }
-        return "exit";
+        return token;
+    }
+
+    private static boolean isNotInMenu(String token, String[] menu) {
+        for (String option : menu) {
+            if (option.equals(token)) return false;
+        }
+        return true;
     }
 
     private static void writeListToFile(String[][] tasks) {
@@ -205,7 +185,8 @@ class TaskManager {
                 for (int i = 0; i < task.length; i++) {
                     if (i==0) continue; //do not write id of line
                     fileLine.append(task[i]);
-                    if (i<task.length-1) fileLine.append(FILE_DELIMITER); //do not add delimiter with the last column
+                    if (i < task.length - 1)
+                        fileLine.append(FILE_DELIMITER).append(EMPTY_STRING); //do not add delimiter after the last column
                 }
                 file.append(fileLine).append("\n");
             }
@@ -213,5 +194,42 @@ class TaskManager {
             System.out.println("Problems with file writing!");
             e.printStackTrace();
         }
+    }
+
+    private static String[][] removeTask(String[][] tasks) {
+        System.out.println(ConsoleColors.BLUE + "Which task should be removed? (from 1 to " + tasks.length + ")");
+        System.out.print(ConsoleColors.RESET);
+        String input;
+        while (isNotParsable(input = getUserInput())) {
+        }
+        tasks = rebuildIndexes(ArrayUtils.remove(tasks, Integer.parseInt(input) - 1));
+        return tasks;
+    }
+
+    private static String[][] rebuildIndexes(String[][] tasks) {
+        for (int i = 0; i < tasks.length; i++) {
+            tasks[i][0] = Integer.toString(i + 1);
+        }
+        return tasks;
+    }
+
+    private static boolean isNotParsable(String num) {
+        try {
+            int index = Integer.parseInt(num);
+        } catch (NumberFormatException e) {
+            System.out.println("Wrong number!");
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isSave() {
+        System.out.println(ConsoleColors.PURPLE + "Do you want to save the list? (y/n)");
+        System.out.print(ConsoleColors.RESET);
+        String input;
+        String[] menu = {YES, NO};
+        while (isNotInMenu(input = getUserInput(), menu)) {
+        }
+        return input.equals(YES);
     }
 }
