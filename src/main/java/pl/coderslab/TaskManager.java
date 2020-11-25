@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.zip.DataFormatException;
 
 class TaskManager {
 
@@ -18,6 +19,7 @@ class TaskManager {
     private static final String YES = "y";
     private static final String NO = "n";
     private static final String EMPTY_STRING = " ";
+    private static final int NUMBER_OF_COLUMNS = 3;
 
     public static void main(String[] args) {
 
@@ -63,7 +65,7 @@ class TaskManager {
     }
 
 
-    public static void displayAllTasks(String[][] tasks) {
+    private static void displayAllTasks(String[][] tasks) {
         System.out.println(ConsoleColors.RESET);
         System.out.println(ConsoleColors.PURPLE + "List of saved tasks: ");
         System.out.print(ConsoleColors.RESET);
@@ -79,7 +81,7 @@ class TaskManager {
     }
 
 
-    public static String[][] addTask(String[][] tasks) {
+    private static String[][] addTask(String[][] tasks) {
         int id = tasks.length + 1;
         String[] task = getTaskFromUser(id);
         tasks = Arrays.copyOf(tasks, tasks.length + 1);
@@ -133,9 +135,13 @@ class TaskManager {
                 arrTasks[numberOfLines] = oneTask;
                 numberOfLines++;
             }
-        } catch (IOException e) {
-            System.out.format("Problems with data file! \n Please check file: %s", TASKS_FILE_DATABASE);
+        } catch (IOException  e) {
+            System.out.format("Problems with data file! \nPlease check file: %s", TASKS_FILE_DATABASE);
             e.printStackTrace();
+        } catch (DataFormatException e){
+            System.out.println("Problems with format data in line " + (numberOfLines+1));
+            System.out.println("Please check the delimiter (should be '" + FILE_DELIMITER + "')");
+            throw new Error();
         }
         return arrTasks;
     }
@@ -148,8 +154,13 @@ class TaskManager {
     }
 
 
-    private static String[] createTask(String line) {
-        return line.split(FILE_DELIMITER);
+    private static String[] createTask(String line) throws DataFormatException {
+        String[] arr = line.trim().split("\\s*"+FILE_DELIMITER+"\\s*");
+        if (arr.length!=NUMBER_OF_COLUMNS){
+            System.out.println(ConsoleColors.RED + "Wrong format data in file " + TASKS_FILE_DATABASE);
+            throw new DataFormatException();
+        }
+        return arr;
     }
 
 
