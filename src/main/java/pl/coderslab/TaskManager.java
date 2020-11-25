@@ -150,8 +150,8 @@ class TaskManager {
     }
 
     private static boolean validateTask(String[] task) {
-        String dateColumn = oneTask[1];
-        String booleanColumn = oneTask[2];
+        String dateColumn = task[1];
+        String booleanColumn = task[2];
         //checkDateFormat(dateColumn);
         return checkBooleanFormat(booleanColumn);
     }
