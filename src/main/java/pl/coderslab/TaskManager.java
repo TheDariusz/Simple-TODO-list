@@ -27,25 +27,24 @@ class TaskManager {
 
         String[][] tasks = readTasksFromFile();
         displayMenu();
+        boolean isExit = false;
 
-
-        while (true) {
+        do {
             String option = menuHandler();
             switch (option) {
                 case "add":
-                    tasks = addTask(tasks);
-                    System.out.println(ConsoleColors.RED + "Task was added!");
-                    System.out.print(ConsoleColors.RESET);
+                    int taskId = createTaskId(tasks);
+                    String[] taskToAdd = getTaskFromUser(taskId);
+                    tasks = addTask(tasks, taskToAdd);
+                    printLog(ConsoleColors.RED, "Task was added!");
                     displayMenu();
                     break;
                 case "remove":
                     if (tasks.length > 0) {
                         tasks = removeTask(tasks);
-                        System.out.println(ConsoleColors.RED + "Task was removed!");
-                        System.out.print(ConsoleColors.RESET);
+                        printLog(ConsoleColors.RED, "Task was removed!");
                     } else {
-                        System.out.println(ConsoleColors.RED + "There is no task to remove!");
-                        System.out.print(ConsoleColors.RESET);
+                        printLog(ConsoleColors.RED, "There is no task to remove!");
                     }
                     break;
                 case "list":
@@ -54,23 +53,27 @@ class TaskManager {
                 case "exit":
                     if (isSave()) {
                         writeListToFile(tasks);
-                        System.out.println(ConsoleColors.RED + "List was saved to file");
-                        System.out.print(ConsoleColors.RESET);
+                        printLog(ConsoleColors.RED, "List was saved to file");
                     }
 
-                    System.out.println(ConsoleColors.RED + "BYE BYE!");
-                    System.out.print(ConsoleColors.RESET);
+                    printLog(ConsoleColors.RED, "BYE BYE!");
+                    isExit=true;
                     break;
             }
-            if (option.equals("exit")) break;
-        }
+        } while (!isExit);
     }
 
-
-    private static void displayAllTasks(String[][] tasks) {
-        System.out.println(ConsoleColors.RESET);
-        System.out.println(ConsoleColors.PURPLE + "List of saved tasks: ");
+    private static void printLog(String color, String msg) {
         System.out.print(ConsoleColors.RESET);
+        System.out.println(color + msg);
+    }
+
+    private static int createTaskId(String[][] tasks) {
+        return tasks.length + 1;
+    }
+
+    public static void displayAllTasks(String[][] tasks) {
+        printLog(ConsoleColors.PURPLE, "List of saved tasks: ");
 
         for (String[] line : tasks) {
             for (String task : line) {
@@ -78,14 +81,11 @@ class TaskManager {
             }
             System.out.println();
         }
-        System.out.println(ConsoleColors.PURPLE + "---------end of list");
-        System.out.println(ConsoleColors.RESET);
+        printLog(ConsoleColors.PURPLE,"---------end of list");
     }
 
 
-    private static String[][] addTask(String[][] tasks) {
-        int id = tasks.length + 1;
-        String[] task = getTaskFromUser(id);
+    public static String[][] addTask(String[][] tasks, String[] task) {
         tasks = Arrays.copyOf(tasks, tasks.length + 1);
         tasks[tasks.length - 1] = task;
         return tasks;
@@ -97,8 +97,7 @@ class TaskManager {
         task[0] = Integer.toString(id);
 
         System.out.println(ConsoleColors.RESET);
-        System.out.println(ConsoleColors.PURPLE + "Provide details of new task: ");
-        System.out.print(ConsoleColors.RESET);
+        printLog(ConsoleColors.PURPLE, "Provide details of new task: ");
 
         System.out.print("Task description: ");
         task[1] = getUserInput();
@@ -115,12 +114,13 @@ class TaskManager {
 
     private static String getUserInput() {
         Scanner input = new Scanner(System.in);
-        String userInput = input.nextLine();
+        String userInput;
 
-        if (userInput.length() > 0) {
-            return userInput;
-        }
-        return getUserInput();
+        do {
+            userInput = input.nextLine();
+        } while (userInput.length() <= 0);
+
+        return userInput;
     }
 
 
@@ -179,9 +179,9 @@ class TaskManager {
 
 
     private static void displayMenu() {
-        System.out.println(ConsoleColors.RESET);
-        System.out.println(ConsoleColors.BLUE + "Please select an option:");
         System.out.print(ConsoleColors.RESET);
+        printLog(ConsoleColors.WHITE, "Please select an option:");
+        System.out.print(ConsoleColors.BLUE);
         for (String menuItem : MENU_OPTIONS) {
             System.out.println(menuItem);
         }
@@ -208,7 +208,9 @@ class TaskManager {
             for (String[] task : tasks) {
                 StringBuilder fileLine = new StringBuilder();
                 for (int i = 0; i < task.length; i++) {
-                    if (i==0) continue; //do not write id of line
+                    if (i==0) {
+                        continue; //do not write id of line
+                    }
                     fileLine.append(task[i]);
                     if (i < task.length - 1)
                         fileLine.append(FILE_DELIMITER).append(EMPTY_STRING); //do not add delimiter after the last column
@@ -225,8 +227,10 @@ class TaskManager {
         System.out.println(ConsoleColors.BLUE + "Which task should be removed? (from 1 to " + tasks.length + ")");
         System.out.print(ConsoleColors.RESET);
         String input;
-        while (isNotParsable(input = getUserInput())) {
-        }
+        do {
+            input = getUserInput();
+        } while (isNotParsable(input));
+
         tasks = rebuildIndexes(ArrayUtils.remove(tasks, Integer.parseInt(input) - 1));
         return tasks;
     }
@@ -240,7 +244,7 @@ class TaskManager {
 
     private static boolean isNotParsable(String num) {
         try {
-            int index = Integer.parseInt(num);
+            Integer.parseInt(num);
         } catch (NumberFormatException e) {
             System.out.println("Wrong number!");
             return true;
@@ -249,12 +253,12 @@ class TaskManager {
     }
 
     private static boolean isSave() {
-        System.out.println(ConsoleColors.PURPLE + "Do you want to save the list? (y/n)");
-        System.out.print(ConsoleColors.RESET);
+        printLog(ConsoleColors.PURPLE, "Do you want to save the list? (y/n)");
         String input;
         String[] menu = {YES, NO};
-        while (isNotInMenu(input = getUserInput(), menu)) {
-        }
+        do {
+            input = getUserInput();
+        } while (isNotInMenu(input, menu));
         return input.equals(YES);
     }
 }
