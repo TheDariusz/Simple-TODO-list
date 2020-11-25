@@ -219,7 +219,7 @@ class TaskManager {
 
     private static boolean isNotParsable(String num) {
         try {
-            int index = Integer.parseInt(num);
+            Integer.parseInt(num);
         } catch (NumberFormatException e) {
             System.out.println("Wrong number!");
             return true;
