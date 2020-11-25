@@ -20,6 +20,8 @@ class TaskManager {
     private static final String NO = "n";
     private static final String EMPTY_STRING = " ";
     private static final int NUMBER_OF_COLUMNS = 3;
+    private static final String TRUE_STRING = "true";
+    private static final String FALSE_STRING = "false";
 
     public static void main(String[] args) {
 
@@ -130,6 +132,7 @@ class TaskManager {
         try (Scanner scan = new Scanner(file)) {
             while (scan.hasNextLine()) {
                 String[] oneTask = createTask(scan.nextLine());
+                //if (!validateTask(oneTask));
                 oneTask = addIndexAtBeginning(numberOfLines, oneTask);
                 arrTasks = Arrays.copyOf(arrTasks, arrTasks.length + 1);
                 arrTasks[numberOfLines] = oneTask;
@@ -144,6 +147,17 @@ class TaskManager {
             throw new Error();
         }
         return arrTasks;
+    }
+
+    private static boolean validateTask(String[] task) {
+        String dateColumn = oneTask[1];
+        String booleanColumn = oneTask[2];
+        //checkDateFormat(dateColumn);
+        return checkBooleanFormat(booleanColumn);
+    }
+
+    private static boolean checkBooleanFormat(String booleanColumn) {
+        return (TRUE_STRING.equals(booleanColumn) || FALSE_STRING.equals(booleanColumn));
     }
 
 
