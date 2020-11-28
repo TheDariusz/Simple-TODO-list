@@ -12,13 +12,15 @@ According to **Tasks** project requirements:
 - data format validation
 
 # Usage
-Program loads tasks from file (by default `TASKS_FILE_DATABASE=tasks.csv`) after starting.
+The program loads tasks from file (by default `TASKS_FILE_DATABASE=tasks.csv`) after starting.
 User can choose one of four options from menu:
 - **add** - add new task to list of tasks (according to *Contraints for new task data format*)
 - **remove** - delete one of task from the existing ones (the program asks which task should be removed, with Integer format and proper number range validation)
 - **list** - display all tasks from the list
-- **exit** - exit program with prompt about if list should be saved 
-The program adds an internal unique identifier for all tasks.
+- **exit** - exit program with prompt about if list should be saved
+
+The program adds an internal unique identifier for all tasks.  
+This id is not stored and saved to file.
 
 
 **Proper tasks file format**:
