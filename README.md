@@ -27,11 +27,11 @@ The program adds an internal unique identifier for all tasks.
 3. rd column - string wiht pattern: `true` or `false` 
 
 
-**Constraints for data file format**:
-- program will throw error if columns are not separated by proper file delimiter (by default `FILE_DELIMITER = ","`) 
-- program will throw error if the second column is not in proper date format (`yyyy-mm-dd`) 
-- program will throw error if the third column is not in proper boolean format (`true` or `false`)
-
+**Constraints for data file format**:  
+The program will throw an error:
+- if columns are not separated by proper file delimiter (by default `FILE_DELIMITER = ","`) 
+- if the second column is not in proper date format (`yyyy-mm-dd`) 
+- if the third column is not in proper boolean format (`true` or `false`)  
 **The program throws IOException if there are any problems with read/write file operations**
 
 
