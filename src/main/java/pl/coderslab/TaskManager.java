@@ -22,10 +22,11 @@ class TaskManager {
     private static final int NUMBER_OF_COLUMNS = 3;
     private static final String TRUE_STRING = "true";
     private static final String FALSE_STRING = "false";
+    static String[][] tasks;
 
     public static void main(String[] args) {
 
-        String[][] tasks = readTasksFromFile();
+        tasks = readTasksFromFile();
         displayMenu();
         boolean isExit = false;
 
@@ -33,30 +34,19 @@ class TaskManager {
             String option = menuHandler();
             switch (option) {
                 case "add":
-                    int taskId = createTaskId(tasks);
-                    String[] taskToAdd = getTaskFromUser(taskId);
-                    tasks = addTask(tasks, taskToAdd);
-                    printLog(ConsoleColors.RED, "Task was added!");
+                    addTask();
                     displayMenu();
                     break;
                 case "remove":
-                    if (tasks.length > 0) {
-                        tasks = removeTask(tasks);
-                        printLog(ConsoleColors.RED, "Task was removed!");
-                    } else {
-                        printLog(ConsoleColors.RED, "There is no task to remove!");
-                    }
+                    removeTask();
+                    displayMenu();
                     break;
                 case "list":
-                    displayAllTasks(tasks);
+                    displayAllTasks();
+                    displayMenu();
                     break;
                 case "exit":
-                    if (isSave()) {
-                        writeListToFile(tasks);
-                        printLog(ConsoleColors.RED, "List was saved to file");
-                    }
-
-                    printLog(ConsoleColors.RED, "BYE BYE!");
+                    writeListToFile();
                     isExit=true;
                     break;
             }
@@ -64,15 +54,15 @@ class TaskManager {
     }
 
     private static void printLog(String color, String msg) {
-        System.out.print(ConsoleColors.RESET);
         System.out.println(color + msg);
+        System.out.print(ConsoleColors.RESET);
     }
 
     private static int createTaskId(String[][] tasks) {
         return tasks.length + 1;
     }
 
-    public static void displayAllTasks(String[][] tasks) {
+    public static void displayAllTasks() {
         printLog(ConsoleColors.PURPLE, "List of saved tasks: ");
 
         for (String[] line : tasks) {
@@ -85,10 +75,12 @@ class TaskManager {
     }
 
 
-    public static String[][] addTask(String[][] tasks, String[] task) {
+    public static void addTask() {
+        int taskId = createTaskId(tasks);
+        String[] task = getTaskFromUser(taskId);
         tasks = Arrays.copyOf(tasks, tasks.length + 1);
         tasks[tasks.length - 1] = task;
-        return tasks;
+        printLog(ConsoleColors.RED, "Task was added!");
     }
 
 
@@ -102,11 +94,20 @@ class TaskManager {
         System.out.print("Task description: ");
         task[1] = getUserInput();
 
-        System.out.print("Due date (yyyy-mm-dd): ");
-        task[2] = getUserInput();
 
-        System.out.print("Is it important (true/false): ");
-        task[3] = getUserInput();
+        String dateColumn;
+        do {
+            System.out.print("Due date (yyyy-mm-dd format): ");
+            dateColumn = getUserInput();
+        } while (!isDateFormat(dateColumn));
+        task[2] = dateColumn;
+
+        String importantColumn;
+        do {
+            System.out.print("Is it important (true/false format): ");
+            importantColumn = getUserInput();
+        } while (!isBooleanFormat(importantColumn));
+        task[3] = importantColumn;
 
         return task;
     }
@@ -132,7 +133,9 @@ class TaskManager {
         try (Scanner scan = new Scanner(file)) {
             while (scan.hasNextLine()) {
                 String[] oneTask = createTask(scan.nextLine());
-                //if (!validateTask(oneTask));
+                if (!validateTask(oneTask, numberOfLines+1)){
+                    throw new RuntimeException("Problem with data file structure!");
+                }
                 oneTask = addIndexAtBeginning(numberOfLines, oneTask);
                 arrTasks = Arrays.copyOf(arrTasks, arrTasks.length + 1);
                 arrTasks[numberOfLines] = oneTask;
@@ -141,22 +144,36 @@ class TaskManager {
         } catch (IOException  e) {
             System.out.format("Problems with data file! \nPlease check file: %s", TASKS_FILE_DATABASE);
             e.printStackTrace();
+            throw new RuntimeException();
         } catch (DataFormatException e){
-            System.out.println("Problems with format data in line " + (numberOfLines+1));
-            System.out.println("Please check the delimiter (should be '" + FILE_DELIMITER + "')");
-            throw new Error();
+            e.printStackTrace();
+            throw new RuntimeException("Problem with delimiter in file!");
         }
         return arrTasks;
     }
 
-    private static boolean validateTask(String[] task) {
+    private static boolean validateTask(String[] task, int id) {
         String dateColumn = task[1];
         String booleanColumn = task[2];
-        //checkDateFormat(dateColumn);
-        return checkBooleanFormat(booleanColumn);
+
+        if (!isBooleanFormat(booleanColumn)){
+            System.out.println("There is a problem with true/false column in line " + id);
+            return false;
+        }
+
+        if (!isDateFormat(dateColumn)){
+            System.out.println("There is a problem with date column in line " + id);
+            return false;
+        }
+
+        return true;
     }
 
-    private static boolean checkBooleanFormat(String booleanColumn) {
+    private static boolean isDateFormat(String dateColumn) {
+       return dateColumn.matches("\\d{4}-\\d{2}-\\d{2}");
+    }
+
+    private static boolean isBooleanFormat(String booleanColumn) {
         return (TRUE_STRING.equals(booleanColumn) || FALSE_STRING.equals(booleanColumn));
     }
 
@@ -202,7 +219,11 @@ class TaskManager {
         return true;
     }
 
-    private static void writeListToFile(String[][] tasks) {
+    private static void writeListToFile() {
+        if (!isSave()) {
+            printLog(ConsoleColors.RED, "BYE BYE!");
+            return;
+        }
 
         try (FileWriter file = new FileWriter(TASKS_FILE_DATABASE, false)) {
             for (String[] task : tasks) {
@@ -221,18 +242,35 @@ class TaskManager {
             System.out.println("Problems with file writing!");
             e.printStackTrace();
         }
+        printLog(ConsoleColors.RED, "List was saved to file");
+        printLog(ConsoleColors.RED, "BYE BYE!");
     }
 
-    private static String[][] removeTask(String[][] tasks) {
+    private static void removeTask() {
+        if (tasks.length == 0) {
+            printLog(ConsoleColors.RED, "There is no task to remove!");
+            return;
+        }
+
         System.out.println(ConsoleColors.BLUE + "Which task should be removed? (from 1 to " + tasks.length + ")");
         System.out.print(ConsoleColors.RESET);
         String input;
+        boolean isIdOk = false;
+
         do {
             input = getUserInput();
-        } while (isNotParsable(input));
+            if (isParsable(input)){
+                if (Integer.parseInt(input)>0 && Integer.parseInt(input)<=tasks.length){
+                    isIdOk=true;
+                } else {
+                    System.out.println("Task id should be in the range from 1 to " + tasks.length);
+                }
+            }
+
+        } while (!isIdOk);
 
         tasks = rebuildIndexes(ArrayUtils.remove(tasks, Integer.parseInt(input) - 1));
-        return tasks;
+        printLog(ConsoleColors.RED, "Task was removed!");
     }
 
     private static String[][] rebuildIndexes(String[][] tasks) {
@@ -242,14 +280,14 @@ class TaskManager {
         return tasks;
     }
 
-    private static boolean isNotParsable(String num) {
+    private static boolean isParsable(String num) {
         try {
             Integer.parseInt(num);
         } catch (NumberFormatException e) {
             System.out.println("Wrong number!");
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     private static boolean isSave() {
