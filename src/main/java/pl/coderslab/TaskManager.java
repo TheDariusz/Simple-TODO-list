@@ -22,7 +22,7 @@ class TaskManager {
     private static final int NUMBER_OF_COLUMNS = 3;
     private static final String TRUE_STRING = "true";
     private static final String FALSE_STRING = "false";
-    static String[][] tasks;
+    private static String[][] tasks;
 
     public static void main(String[] args) {
 
@@ -62,7 +62,7 @@ class TaskManager {
         return tasks.length + 1;
     }
 
-    public static void displayAllTasks() {
+    private static void displayAllTasks() {
         printLog(ConsoleColors.PURPLE, "List of saved tasks: ");
 
         for (String[] line : tasks) {
@@ -75,7 +75,7 @@ class TaskManager {
     }
 
 
-    public static void addTask() {
+    private static void addTask() {
         int taskId = createTaskId(tasks);
         String[] task = getTaskFromUser(taskId);
         tasks = Arrays.copyOf(tasks, tasks.length + 1);
@@ -142,12 +142,9 @@ class TaskManager {
                 numberOfLines++;
             }
         } catch (IOException  e) {
-            System.out.format("Problems with data file! \nPlease check file: %s", TASKS_FILE_DATABASE);
-            e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException("Problems with data file!", e);
         } catch (DataFormatException e){
-            e.printStackTrace();
-            throw new RuntimeException("Problem with delimiter in file!");
+            throw new RuntimeException("Problem with delimiter in file!", e);
         }
         return arrTasks;
     }
